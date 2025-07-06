@@ -1,0 +1,15 @@
+{
+    "number": "411111******1111",
+    "email": "user1@example.com",
+    "password": "$2a$10$xJwL5v5Jz5UZJf5h5f5Z5.",
+    "status": "ACTIVE"
+}
+
+{
+    "email": "user1@example.com",
+    "password": "$2a$10$xJwL5v5Jz5UZJf5h5f5Z5.",
+    "firstName": "Jora",
+    "lastName": "Han",
+    "middleName": "ars",
+    "phone": "89242345678"
+}
