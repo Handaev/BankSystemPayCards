@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -18,41 +20,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    public User save(User user){
-//        try{
-//            if(user == null){
-//                logger.debug("User cannot be null");
-//            }
-//
-//            logger.info("Attempting to save user: {}", user);
-//
-//            userRepository.insertUser(user);
-//            logger.info("User saved successfully with ID {}", user.getId());
-//            return user;
-//        }catch (DataAccessException ex){
-//            logger.info("Failed to save user with ID: {}" + user.getId(), ex);
-//            throw new DataAccessException("Failed to save card", ex) {};
-//        }catch (IllegalArgumentException ex){
-//            throw new IllegalArgumentException("User cannot be null", ex){};
-//        }
-//    }
+    public List<User> findAllUsers(){
+        return userRepository.findAllUsers();
+    }
 
 }

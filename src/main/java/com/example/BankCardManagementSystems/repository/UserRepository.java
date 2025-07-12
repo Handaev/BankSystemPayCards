@@ -1,63 +1,97 @@
 package com.example.BankCardManagementSystems.repository;
 
-
 import com.example.BankCardManagementSystems.entity.User;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
+import static com.example.BankCardManagementSystems.log.PrintLog.*;
+
 @Repository
+@Transactional
 public class UserRepository {
 
-    private final EntityManagerFactory entityManagerFactory;
+    @Autowired
+    private EntityManager entityManager;
 
-    public UserRepository(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
+    public List<User> findAllUsers(){
+        try{
+            startLogTransaction("findAllUsers");
+
+            List<User> result = createQueryFindAllUsers();
+
+            theEndLogTransaction("findAllUsers");
+            return result;
+        } catch (RuntimeException e) {
+            throw new DataAccessException("Failed to retrieve users", e){};
+        }
+    }
+
+    private List<User> createQueryFindAllUsers(){
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> cq = cb.createQuery(User.class);
+        Root<User> root = cq.from(User.class);
+        cq.select(root);
+
+        return entityManager.createQuery(cq).getResultList();
+    }
+
+    public User findById(String id){
+        try {
+            startLogTransaction("findById");
+
+            User user = createQueryFindById(id);
+
+            theEndLogTransaction("findById");
+            return user;
+        }catch (RuntimeException ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private User createQueryFindById(String UserId){
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> cq = cb.createQuery(User.class);
+        Root<User> root = cq.from(User.class);
+        cq.select(root).where(cb.equal(root.get("id"), UserId));
+
+        return entityManager.createQuery(cq).getSingleResult();
+    }
+
+    public void saveUser(User user){
+        try {
+            startLogTransaction("saveUser");
+
+            entityManager.persist(user);
+
+            theEndLogTransaction("saveUser");
+        }catch (RuntimeException ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public void updateUser(User user){
+        try {
+            startLogTransaction("updateUser");
+
+            entityManager.merge(user);
+
+            theEndLogTransaction("updateUser");
+        }catch (RuntimeException ex){
+            throw new RuntimeException(ex);
+        }
     }
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    public void insertUser(User user) {
-//        if (user == null) {
-//            throw new IllegalArgumentException("User cannot be null");
-//        }
-//
-//        EntityManager em = entityManagerFactory.createEntityManager();
-//        EntityTransaction tx = null;
-//        try {
-//            tx = em.getTransaction();
-//            tx.begin();
-//            em.persist(user);
-//            tx.commit();
-//        } catch (Exception ex) {
-//            if (tx != null && tx.isActive()) {
-//                tx.rollback();
-//            }
-//            throw new RuntimeException("Failed to save user", ex);
-//        } finally {
-//            em.close();
-//        }
-//    }
 
 
 }
