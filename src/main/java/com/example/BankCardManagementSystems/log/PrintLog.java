@@ -12,4 +12,16 @@ public class PrintLog {
     public static void theEndLogTransaction(String method){
         log.debug("Transaction commited successfully. {}", method);
     }
+
+    public static void CloseEntityManager(String method){
+        log.debug("Closing EntityManager. Method - {}", method);
+    }
+
+    public static void processLogTransactionByAll(String method){
+        log.debug("Executing JPA query to fetch all. Method - {}", method);
+    }
+
+    public static void processLogTransactionById(String method){
+        log.debug("Executing JPA query to fetch id. Method - {}", method);
+    }
 }

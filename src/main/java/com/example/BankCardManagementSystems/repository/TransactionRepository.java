@@ -1,6 +1,7 @@
 package com.example.BankCardManagementSystems.repository;
 
 import com.example.BankCardManagementSystems.entity.Transaction;
+import com.example.BankCardManagementSystems.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -13,39 +14,39 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.example.BankCardManagementSystems.log.PrintLog.*;
+
 @Repository
 @Transactional
 public class TransactionRepository {
 
     private final EntityManagerFactory entityManagerFactory;
 
-    private static final Logger logger = LoggerFactory.getLogger(TransactionRepository.class);
-
     public TransactionRepository(EntityManagerFactory entityManagerFactory){
         this.entityManagerFactory = entityManagerFactory;
     }
 
-    public List<Transaction> findAllTransactions(){
-        try (EntityManager em = createEntityManager()) {
-            startTransactionPrint("findAllTransactions");
+    public List<Transaction> findAllTransactions() {
+        EntityManager em = null;
+        try {
+            em = createEntityManager();
+            startLogTransaction("findAllTransactions");
 
             List<Transaction> result = criteriaQueryFindAllTransaction(em);
 
-            theEndTransactionPrint("findAllTransactions");
+            theEndLogTransaction("findAllTransactions");
             return result;
         } catch (RuntimeException ex) {
             throw new RuntimeException("Error fetching findAllTransactions", ex);
         } finally {
-            logger.debug("Closing EntityManager ");
+            assert em != null;
+            em.close();
+            CloseEntityManager("findAllTransactions");
         }
     }
 
     private EntityManager createEntityManager(){
         return entityManagerFactory.createEntityManager();
-    }
-
-    private void startTransactionPrint(String method){
-        logger.debug("Starting {}() - Creating transaction and query", method);
     }
 
     private List<Transaction> criteriaQueryFindAllTransaction(EntityManager em){
@@ -54,11 +55,82 @@ public class TransactionRepository {
         Root<Transaction> root = cq.from(Transaction.class);
         cq.select(root);
 
-        logger.debug("Executing JPA query to fetch all findAllTransactions");
+        processLogTransactionByAll("criteriaQueryFindAllTransaction");
         return em.createQuery(cq).getResultList();
     }
 
-    private void theEndTransactionPrint(String method){
-        logger.debug("Transaction committed successfully. Retrieved {}", method);
+    public Transaction findById(String id){
+        EntityManager em = createEntityManager();
+        try{
+            startLogTransaction("findById");
+
+            Transaction tr = criteriaQueryFindById(em, id);
+
+            theEndLogTransaction("findById");
+            return tr;
+        }catch(RuntimeException ex){
+            throw new RuntimeException(ex);
+        }finally{
+            em.close();
+
+        }
+    }
+
+    private Transaction criteriaQueryFindById(EntityManager em, String id){
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Transaction> cq = cb.createQuery(Transaction.class);
+        Root<Transaction> root = cq.from(Transaction.class);
+        cq.select(root).where(cb.equal(root.get("id"), id));
+
+        processLogTransactionById("criteriaQueryFindById");
+        return em.createQuery(cq).getSingleResult();
+    }
+
+    public void saveUser(User user){
+        EntityManager em = createEntityManager();
+        try {
+            startLogTransaction("saveUser");
+
+            em.persist(user);
+
+            theEndLogTransaction("saveUser");
+        }catch (RuntimeException ex){
+            throw new RuntimeException(ex);
+        }finally {
+            em.close();
+            CloseEntityManager("saveUser");
+        }
+    }
+
+    public void updateUser(User user){
+        EntityManager em = createEntityManager();
+        try {
+            startLogTransaction("updateUser");
+
+            em.merge(user);
+
+            theEndLogTransaction("updateUser");
+        }catch (RuntimeException ex){
+            throw new RuntimeException(ex);
+        } finally {
+            em.close();
+            CloseEntityManager("saveUser");
+        }
+    }
+
+    public void deleteUser(String id){
+        EntityManager em = createEntityManager();
+        try{
+            startLogTransaction("deleteUser");
+
+            em.remove(findById(id));
+
+            theEndLogTransaction("deleteUser");
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        } finally {
+            em.close();
+            CloseEntityManager("saveUser");
+        }
     }
 }

@@ -56,11 +56,11 @@ public class UserRepository {
         }
     }
 
-    private User createQueryFindById(String UserId){
+    private User createQueryFindById(String id){
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> cq = cb.createQuery(User.class);
         Root<User> root = cq.from(User.class);
-        cq.select(root).where(cb.equal(root.get("id"), UserId));
+        cq.select(root).where(cb.equal(root.get("id"), id));
 
         return entityManager.createQuery(cq).getSingleResult();
     }
@@ -89,9 +89,15 @@ public class UserRepository {
         }
     }
 
+    public void deleteUser(String id){
+        try{
+            startLogTransaction("deleteUser");
 
+            entityManager.remove(findById(id));
 
-
-
-
+            theEndLogTransaction("deleteUser");
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
