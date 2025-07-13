@@ -15,8 +15,6 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
     @Autowired
     private UserRepository userRepository;
 
@@ -24,4 +22,19 @@ public class UserService {
         return userRepository.findAllUsers();
     }
 
+    public User findById(String id){
+        return userRepository.findById(id);
+    }
+
+    public void save(User user){
+        userRepository.saveUser(user);
+    }
+
+    public void update(User user){
+        userRepository.updateUser(user);
+    }
+
+    public void delete(String id){
+        userRepository.deleteUser(id);
+    }
 }

@@ -86,51 +86,51 @@ public class TransactionRepository {
         return em.createQuery(cq).getSingleResult();
     }
 
-    public void saveUser(User user){
+    public void saveTransaction(Transaction transaction){
         EntityManager em = createEntityManager();
         try {
-            startLogTransaction("saveUser");
+            startLogTransaction("saveTransaction");
 
-            em.persist(user);
+            em.persist(transaction);
 
-            theEndLogTransaction("saveUser");
+            theEndLogTransaction("saveTransaction");
         }catch (RuntimeException ex){
             throw new RuntimeException(ex);
         }finally {
             em.close();
-            CloseEntityManager("saveUser");
+            CloseEntityManager("saveTransaction");
         }
     }
 
-    public void updateUser(User user){
+    public void updateTransaction(Transaction transaction){
         EntityManager em = createEntityManager();
         try {
-            startLogTransaction("updateUser");
+            startLogTransaction("updateTransaction");
 
-            em.merge(user);
+            em.merge(transaction);
 
-            theEndLogTransaction("updateUser");
+            theEndLogTransaction("updateTransaction");
         }catch (RuntimeException ex){
             throw new RuntimeException(ex);
         } finally {
             em.close();
-            CloseEntityManager("saveUser");
+            CloseEntityManager("updateTransaction");
         }
     }
 
-    public void deleteUser(String id){
+    public void deleteTransaction(String id){
         EntityManager em = createEntityManager();
         try{
-            startLogTransaction("deleteUser");
+            startLogTransaction("deleteTransaction");
 
             em.remove(findById(id));
 
-            theEndLogTransaction("deleteUser");
+            theEndLogTransaction("deleteTransaction");
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         } finally {
             em.close();
-            CloseEntityManager("saveUser");
+            CloseEntityManager("deleteTransaction");
         }
     }
 }
